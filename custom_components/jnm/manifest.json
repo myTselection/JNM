@@ -1,0 +1,13 @@
+{
+  "domain": "jnm",
+  "name": "JNM",
+  "codeowners": ["@myTselection"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/myTselection/JNM",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/myTselection/JNM/issues",
+  "requirements": ["bs4","requests"],
+  "version": "1.0.0"
+}

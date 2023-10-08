@@ -1,0 +1,41 @@
+{
+    "config": {
+        "title": "JNM",
+        "step": {
+            "user": {
+                "description": "Opzetten JNM",
+                "data": {
+                    "username": "Gebruikersnaam",
+                    "password": "Wachtwoord"
+                }
+            },
+            "edit": {
+                "description": "Setup JNM",
+                "data": {
+                    "username": "Gebruikersnaam",
+                    "password": "Wachtwoord"
+                }
+            }
+
+        },
+        "error": {
+            "missing data options handler": "Gegevens ontbreken",
+            "no_valid_settings": "Ongeldige configuratie"
+        }
+    },
+    "options": {
+        "step": {
+            "edit": {
+                "description": "Setup JNM",
+                "data": {
+                    "username": "Gebruikersnaam",
+                    "password": "Wachtwoord"
+                }
+            }
+        },
+        "error": {
+            "missing data options handler": "Gegevens ontbreken",
+            "no_valid_settings": "Ongeldige configuratie"
+        }
+    }
+}

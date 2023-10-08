@@ -1,0 +1,41 @@
+{
+    "config": {
+        "title": "JNM",
+        "step": {
+            "user": {
+                "description": "Setup JNM",
+                "data": {
+                    "username": "Username",
+                    "password": "Password"
+                }
+            },
+            "edit": {
+                "description": "Setup JNM",
+                "data": {
+                    "username": "Username",
+                    "password": "Password"
+                }
+            }
+
+        },
+        "error": {
+            "missing data options handler": "Option handler failed",
+            "no_valid_settings": "No valid settings check in ha config."
+        }
+    },
+    "options": {
+        "step": {
+            "edit": {
+                "description": "Setup JNM",
+                "data": {
+                    "username": "Username",
+                    "password": "Password"
+                }
+            }
+        },
+        "error": {
+            "missing data options handler": "Option handler failed",
+            "no_valid_settings": "No valid settings check in ha config."
+        }
+    }
+}
