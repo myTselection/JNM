@@ -21,9 +21,6 @@ from .utils import *
 _LOGGER = logging.getLogger(__name__)
 
 
-
-provider_names = list(providers.keys())
-
 def create_schema(entry, option=False):
     """Create a default schema based on if a option or if settings
     is already filled out.
