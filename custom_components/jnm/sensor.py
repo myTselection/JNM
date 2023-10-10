@@ -50,7 +50,7 @@ async def dry_setup(hass, config_entry, async_add_devices):
         password,
         hass
     )
-    await componentData._force_update()
+    await componentData._forced_update()
 
     
     _LOGGER.debug(f"userdetails dry_setup {componentData._userdetails}") 
@@ -58,7 +58,7 @@ async def dry_setup(hass, config_entry, async_add_devices):
     #TODO create sensors
     userSensor = ComponentUserSensor(componentData)
     sensors.append(userSensor)
-    
+
     async_add_devices(sensors)
 
 
