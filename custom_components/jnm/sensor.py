@@ -58,6 +58,10 @@ async def dry_setup(hass, config_entry, async_add_devices):
     #TODO create sensors
     userSensor = ComponentUserSensor(componentData)
     sensors.append(userSensor)
+    activitySensor = ComponentActivitySensor(componentData)
+    sensors.append(activitySensor)
+    subscribedActivitySensor = ComponentSubscribedActivitySensor(componentData)
+    sensors.append(subscribedActivitySensor)
 
     async_add_devices(sensors)
 
@@ -108,6 +112,8 @@ class ComponentData:
         self._hass = hass
         self._session = ComponentSession()
         self._userdetails = None
+        self._activities = None
+        self._subscribed_activities = None
         self._last_update = None
         self._refresh_required = True
         self._refresh_retry = 0
@@ -132,6 +138,8 @@ class ComponentData:
             _LOGGER.debug("Getting data for " + NAME)
             try:
                 self._userdetails = await self._hass.async_add_executor_job(lambda: self._session.login(self._username, self._password))
+                self._activities = await self._hass.async_add_executor_job(lambda: self._session.getActivities(self._userdetails))
+                self._subscribed_activities = await self._hass.async_add_executor_job(lambda: self._session.getSubscribedActivities(self._userdetails))
                 self._refresh_retry = 0
                 self._refresh_required = False
             except Exception as e:
@@ -175,7 +183,7 @@ class ComponentUserSensor(Entity):
         self._userdetails = self._data._userdetails
         self._last_update =  self._data._last_update
         self._age_group = self._userdetails.get('department').get('age_group')
-        self._department_title = self._userdetails.get('department').get('_department_title')
+        self._department_title = self._userdetails.get('department').get('department_title')
         self._name = self._userdetails.get('user_details').get('name')
         self._username = self._userdetails.get('membership').get('username')
         self._membership_number = self._userdetails.get('membership').get('membership_number')
@@ -194,7 +202,7 @@ class ComponentUserSensor(Entity):
     @property
     def unique_id(self) -> str:
         """Return the unique ID of the sensor."""
-        return f"{self._data.unique_id}"
+        return f"{self._data.unique_id} group"
 
     @property
     def name(self) -> str:
@@ -212,6 +220,162 @@ class ComponentUserSensor(Entity):
             "name": self._name,
             "username": self._username,
             "membership_number": self._membership_number
+        }
+
+   
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return the device info."""
+        return DeviceInfo(
+            identifiers={
+                # Serial numbers are unique identifiers within a specific domain
+                (NAME, self._data.unique_id)
+            },
+            name=self._data.name,
+            manufacturer= NAME
+        )
+
+    @property
+    def friendly_name(self) -> str:
+        return self.unique_id
+
+class ComponentActivitySensor(Entity):
+    def __init__(self, data):
+        self._data = data
+        self._userdetails = data._userdetails
+        self._activities = data._activities
+        self._last_update =  self._data._last_update
+        self._next_activity_date = None
+        self._next_activity_name = None
+        self._next_activity_group = None
+        self._next_activity_link = None
+
+    @property
+    def state(self):
+        """Return the state of the sensor."""
+        return self._next_activity_date
+
+    async def async_update(self):
+        await self._data.update()
+        self._userdetails = self._data._userdetails
+        self._activities = self._data._activities
+        self._last_update =  self._data._last_update
+        
+        self._next_activity_date = self._activities[0].get('date')
+        self._next_activity_name = self._activities[0].get('name')
+        self._next_activity_group = self._activities[0].get('group')
+        self._next_activity_link = self._activities[0].get('link')
+
+
+    async def async_will_remove_from_hass(self):
+        """Clean up after entity before removal."""
+        _LOGGER.info("async_will_remove_from_hass " + NAME)
+        self._data.clear_session()
+
+    @property
+    def icon(self) -> str:
+        """Shows the correct icon for container."""
+        return "mdi:account-circle"
+
+    @property
+    def unique_id(self) -> str:
+        """Return the unique ID of the sensor."""
+        return f"{self._data.unique_id} next activity"
+
+    @property
+    def name(self) -> str:
+        """Return the name of the sensor."""
+        return self.unique_id
+
+    @property
+    def extra_state_attributes(self) -> dict:
+        """Return the state attributes."""
+        return {
+            ATTR_ATTRIBUTION: NAME,
+            "last update": self._last_update,
+            "next activity date": self._next_activity_date,
+            "next activity name": self._next_activity_name,
+            "next activity group": self._next_activity_group,
+            "next activity link": self._next_activity_link,
+            "future activities": self._activities
+        }
+
+   
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return the device info."""
+        return DeviceInfo(
+            identifiers={
+                # Serial numbers are unique identifiers within a specific domain
+                (NAME, self._data.unique_id)
+            },
+            name=self._data.name,
+            manufacturer= NAME
+        )
+
+    @property
+    def friendly_name(self) -> str:
+        return self.unique_id
+
+class ComponentSubscribedActivitySensor(Entity):
+    def __init__(self, data):
+        self._data = data
+        self._userdetails = data._userdetails
+        self._activities = data._activities
+        self._last_update =  self._data._last_update
+        self._last_activity_date = None
+        self._last_activity_name = None
+        self._last_activity_group = None
+        self._last_activity_link = None
+
+    @property
+    def state(self):
+        """Return the state of the sensor."""
+        return self._last_activity_date
+
+    async def async_update(self):
+        await self._data.update()
+        self._userdetails = self._data._userdetails
+        self._activities = self._data._subscribed_activities
+        self._last_update =  self._data._last_update
+        
+        self._last_activity_date = self._activities[0].get('date')
+        self._last_activity_name = self._activities[0].get('name')
+        self._last_activity_group = self._activities[0].get('group')
+        self._last_activity_link = self._activities[0].get('link')
+
+
+    async def async_will_remove_from_hass(self):
+        """Clean up after entity before removal."""
+        _LOGGER.info("async_will_remove_from_hass " + NAME)
+        self._data.clear_session()
+
+    @property
+    def icon(self) -> str:
+        """Shows the correct icon for container."""
+        return "mdi:account-circle"
+
+    @property
+    def unique_id(self) -> str:
+        """Return the unique ID of the sensor."""
+        return f"{self._data.unique_id} last subscribed activity"
+
+    @property
+    def name(self) -> str:
+        """Return the name of the sensor."""
+        return self.unique_id
+
+    @property
+    def extra_state_attributes(self) -> dict:
+        """Return the state attributes."""
+        return {
+            ATTR_ATTRIBUTION: NAME,
+            "last update": self._last_update,
+            "last activity date": self._last_activity_date,
+            "last activity name": self._last_activity_name,
+            "last activity group": self._last_activity_group,
+            "last activity link": self._last_activity_link,
+            "past activities": self._activities
         }
 
    

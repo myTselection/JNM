@@ -64,8 +64,8 @@ def login():
     csrf_token = csrf_token_meta['content']
 
     #TODO
-    username = ""
-    password = ""
+    username = "mathias_janssens_03062013"
+    password = "Jnm517!"
     
  
     response = s.post("https://jnm.be/nl/inloggen",headers=header,data=f"_token={csrf_token}&username={username}&password={password}&login=", timeout=15,allow_redirects=False)
@@ -114,9 +114,57 @@ def login():
             'department_title': department.h3.a.text.strip(),
             'age_group': department.dl.dd.text.strip()
         }
-
-    return data
     
+
+    
+    department = data.get('department').get('department_title').replace(' ','-').lower()
+    age_group = data.get('department').get('age_group').lower()
+
+    response = s.get(f"https://jnm.be/nl/activiteiten?group={age_group}&department={department}",headers=header, timeout=15,allow_redirects=False)
+    _LOGGER.debug(f"jnm.be activities get status code: {response.status_code}")
+    _LOGGER.debug(f"jnm.be activities header: {response.headers}")
+    _LOGGER.debug(f"jnm.be activities text: {response.text}")
+    assert response.status_code == 200
+
+    # Parse the HTML content
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # Create a dictionary to store the extracted data
+    data = {}
+
+    # Extract relevant data
+    # Find the unsorted list with the specified class
+    cards = soup.find_all('div', class_='card card--activity--calendar')
+
+    for card in cards:
+        # Extract date
+        date_element = card.find('time')
+        date = date_element.get_text(strip=True)
+
+        # Extract name
+        name_element = card.find('h2').find('a')
+        name = name_element.get_text(strip=True)
+
+        # Extract group
+        group_element = card.find('span', class_='card--activity--calendar__info')
+        group = group_element.get_text(strip=True)
+    return data
+
+# Define a function to convert BeautifulSoup tree to JSON
+def html_to_json(element):
+    result = {}
+    if element.name:
+        result[element.name] = {}
+        if element.attrs:
+            result[element.name]["attributes"] = element.attrs
+        if element.contents:
+            if len(element.contents) == 1 and element.contents[0].string:
+                result[element.name]["text"] = element.contents[0]
+            else:
+                result[element.name]["children"] = [html_to_json(child) for child in element.contents if child.name or (str(child).strip() != '')]
+    return result
+
+
 def old():
     #authorize based on url in location of response received
     response = s.get(oauth_location,headers=header,timeout=10,allow_redirects=False)
