@@ -136,7 +136,7 @@ class ComponentSession(object):
         
         activities = self.getActivityData(f"https://jnm.be/nl/activiteiten?group={age_group}&department={department}")
 
-        for activity in activities[:2]:
+        for activity in activities:
             activity_details = self.getActivityDetailsData(activity.get('link'))
             activity['details'] = activity_details
 
@@ -273,19 +273,19 @@ class ComponentSession(object):
         responsible_persons = [element.get_text(strip=True) for element in soup.select('.activity-show strong')]
         data['responsible_persons'] = responsible_persons
 
-        # Extract activity description
-        activity_description = soup.find('div', class_='text-columns__1')
-        if activity_description:
-            data['activity_description2'] = activity_description.text.strip()
+        # # Extract activity description
+        # activity_description = soup.find('div', class_='text-columns__1')
+        # if activity_description:
+        #     data['activity_description2'] = activity_description.text.strip()
 
-        # Extract responsible person(s)
-        responsible_persons = []
-        responsible_person_elements = soup.find_all('strong')
-        for element in responsible_person_elements:
-            responsible_person = element.text.strip()
-            if "(Activiteitverantwoordelijke)" in responsible_person:
-                responsible_person = responsible_person.replace("(Activiteitverantwoordelijke)", "").strip()
-            responsible_persons.append(responsible_person)
-        data['responsible_persons2'] = responsible_persons
+        # # Extract responsible person(s)
+        # responsible_persons = []
+        # responsible_person_elements = soup.find_all('strong')
+        # for element in responsible_person_elements:
+        #     responsible_person = element.text.strip()
+        #     if "(Activiteitverantwoordelijke)" in responsible_person:
+        #         responsible_person = responsible_person.replace("(Activiteitverantwoordelijke)", "").strip()
+        #     responsible_persons.append(responsible_person)
+        # data['responsible_persons2'] = responsible_persons
         return data
         

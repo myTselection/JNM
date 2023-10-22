@@ -374,8 +374,7 @@ class ComponentSubscribedActivitySensor(Entity):
             "last activity date": self._last_activity_date,
             "last activity name": self._last_activity_name,
             "last activity group": self._last_activity_group,
-            "last activity link": self._last_activity_link,
-            "past activities": self._activities
+            "last activity link": self._last_activity_link
         }
 
    

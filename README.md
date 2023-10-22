@@ -7,7 +7,7 @@
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/m/myTselection/JNM.svg)](https://github.com/myTselection/JNM/graphs/commit-activity)
 
 # JNM - Home Assistant integration
-[JNM](https://www.jnm.be/) Home Assistant custom component integration for Belgium. This custom component has been built from the ground up to bring jnm.be site data into Home Assistant sensors in order to follow up activities and subscribe. This integration is built against the public website provided by jnm.be for Belgium and has not been tested for any other countries.
+[JNM](https://www.jnm.be/) Home Assistant custom component integration for Belgium. JNM is a Belgian youth union for Nature and the Environment, https://jnm.be/nl/dat-is-jnm This custom component has been built from the ground up to bring jnm.be activities listed on the site into Home Assistant sensors in order to follow up activities and subscribe. This integration is built against the public website provided by jnm.be for Belgium and has not been tested for any other countries.
 
 This integration is in no way affiliated with JNM.
 
@@ -25,7 +25,7 @@ This integration is in no way affiliated with JNM.
 
 ## Integration
 Device `JNM` should become available with the following sensors:
-- <details><summary><code>JNM [username]</code> with details </summary>
+- <details><summary><code>JNM_[username]_group</code> with details </summary>
 
 
 	| Attribute | Description |
@@ -37,6 +37,35 @@ Device `JNM` should become available with the following sensors:
   | Name       | Name       |
   | Username   | Username   |
   | Membership number | Membership number |
+	
+</details>
+
+- <details><summary><code>JNM_[username]_next_activity</code> with details </summary>
+
+
+	| Attribute | Description |
+	| --------- | ----------- |
+	| State     | Date next activity  |
+	| Last update   | Timestamp of last data refresh, throttled to limit data fetch to 1h |
+  | next activity date  | Date of the next activity  |
+  | next activity name  | Name of the next activity |
+  | next activity group | Group of the next activity  |
+  | next activity link  | Link of the next activity   |
+  | future activities   | Details of the next activity with: date, name, group, link, details. The details contain: activity_type, activity_name, start_date, start_time, end_time, theme, organized_by, participating_department, age_group, location, num_participants, bring_bicycle, activity_description, responsible_persons   |
+	
+</details>
+
+- <details><summary><code>JNM_[username]_last_subscribed_activity</code> with details </summary>
+
+
+	| Attribute | Description |
+	| --------- | ----------- |
+	| State     | Date last subscribed activity  |
+	| Last update   | Timestamp of last data refresh, throttled to limit data fetch to 1h |
+  | last activity date  | Date last subscribed activity  |
+  | last activity name  | Name of the last subscribed activity |
+  | last activity group |  Group of the last subscribed activity  |
+  | last activity link  | Link of the last subscribed activity   |
 	
 </details>
 
@@ -68,3 +97,49 @@ recorder:
     entity_globs:
       - sensor.jnm*
 ```
+
+## Example markdown
+<details><summary>Below markdown can be used to display all upcoming activities</summary>
+
+```
+type: markdown
+content: >-
+  Volgende activiteit:
+  {{states('sensor.jnm_[name]_next_activity')| as_timestamp |
+  timestamp_custom("%a %d/%m/%Y")}} -
+  [{{state_attr('sensor.jnm_[name]_next_activity','next
+  activity
+  name')}}]({{state_attr('sensor.jnm_[name]_next_activity','next
+  activity link')}})
+
+  {% if states('sensor.jnm_[name]_next_activity') ==
+  states('sensor.jnm_[name]_last_subscribed_activity')
+  %}Ingeschreven{% else %}**Nog niet ingeschreven**{% endif %}
+
+
+
+  | Datum | Activiteit |
+
+  | :-----| :----------|
+
+  {% for activity in
+  state_attr('sensor.jnm_[name]_next_activity','future
+  activities') %}| {{activity.date| as_timestamp | timestamp_custom("%a
+  %d/%m/%Y")}} | {% if activity.details is defined
+  %}<details><summary>[{{activity.name}}]({{activity.link}})</summary><table><tr><th>Locatie</th><td><a
+  href="https://www.google.com/maps?q={{activity.details.location}}">{{activity.details.location}}</a></td></tr><tr><th>Uur</th><td>{{activity.details.start_time}}
+  -
+  {{activity.details.end_time}}</td></tr><tr><th>Omschrijving</th><td>{{activity.details.activity_description}}</td></tr><tr><th>Deelnemers</th><td>{{activity.details.num_participants}}</td></tr></table></details>{%
+  else %}[{{activity.name}}]({{activity.link}}){% endif %} |
+
+  {% endfor %}
+
+
+
+  Laatst bijgewerkt
+  {{state_attr('sensor.jnm_[name]_group','last update')|
+  as_timestamp | timestamp_custom("%a %d/%m/%Y %H:%M")}}
+
+```
+
+</details>
