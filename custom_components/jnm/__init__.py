@@ -9,26 +9,25 @@ from homeassistant.core import Config, HomeAssistant
 from homeassistant.const import Platform
 from .utils import *
 
-manifestfile = Path(__file__).parent / 'manifest.json'
-with open(manifestfile, 'r') as json_file:
-    manifest_data = json.load(json_file)
+# manifestfile = Path(__file__).parent / 'manifest.json'
+# with open(manifestfile, 'r') as json_file:
+#     manifest_data = json.load(json_file)
     
-DOMAIN = manifest_data.get("domain")
-NAME = manifest_data.get("name")
-VERSION = manifest_data.get("version")
-ISSUEURL = manifest_data.get("issue_tracker")
+# DOMAIN = "manifest_data.get("domain")"
+# NAME = manifest_data.get("name")
+# VERSION = manifest_data.get("version")
+# ISSUEURL = manifest_data.get("issue_tracker")
+DOMAIN = "jnm"
+NAME = "JNM"
+
 PLATFORMS = [Platform.SENSOR]
 
 STARTUP = """
 -------------------------------------------------------------------
 {name}
-Version: {version}
-This is a custom component
-If you have any issues with this you need to open an issue here:
-{issueurl}
 -------------------------------------------------------------------
 """.format(
-    name=NAME, version=VERSION, issueurl=ISSUEURL
+    name=NAME
 )
 
 

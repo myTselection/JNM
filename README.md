@@ -60,3 +60,11 @@ logger:
      custom_components.jnm: debug
 ```
 </details>
+
+Since the sensors of this JNM integration may contain much data in the attributes, it might be desired to disable full detailed history logging in the recorder of Home Assistant. You may disable it by adding below in `configuration.yaml`:
+```
+recorder:
+  exclude:
+    entity_globs:
+      - sensor.jnm*
+```

@@ -114,9 +114,146 @@ def login():
             'department_title': department.h3.a.text.strip(),
             'age_group': department.dl.dd.text.strip()
         }
-
-    return data
     
+
+    
+    department = data.get('department').get('department_title').replace(' ','-').lower()
+    age_group = data.get('department').get('age_group').lower()
+
+    response = s.get(f"https://jnm.be/nl/activiteiten?group={age_group}&department={department}",headers=header, timeout=15,allow_redirects=False)
+    _LOGGER.debug(f"jnm.be activities get status code: {response.status_code}")
+    _LOGGER.debug(f"jnm.be activities header: {response.headers}")
+    _LOGGER.debug(f"jnm.be activities text: {response.text}")
+    assert response.status_code == 200
+
+    # Parse the HTML content
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # Create a dictionary to store the extracted data
+    data = {}
+
+    # Extract relevant data
+    # Find the unsorted list with the specified class
+    cards = soup.find_all('div', class_='card card--activity--calendar')
+
+    for card in cards:
+        # Extract date
+        date_element = card.find('time')
+        date = date_element.get_text(strip=True)
+
+        # Extract name
+        name_element = card.find('h2').find('a')
+        name = name_element.get_text(strip=True)
+
+        # Extract group
+        group_element = card.find('span', class_='card--activity--calendar__info')
+        group = group_element.get_text(strip=True)
+
+    url = "https://jnm.be/nl/activiteiten/van-markt-tot-kookpot"
+    
+    response = s.get(f"{url}",headers=header, timeout=15,allow_redirects=False)
+    _LOGGER.debug(f"jnm.be activities details get status code: {response.status_code}, url: {url}")
+    _LOGGER.debug(f"jnm.be activities header: {response.headers}")
+    _LOGGER.debug(f"jnm.be activities text: {response.text}")
+    assert response.status_code == 200
+
+    # Parse the HTML content
+    soup = BeautifulSoup(response.text, 'html.parser')
+    card = soup.find('div', class_='container mt-6 mb-140 activity-show')
+
+    # Create a dictionary to store the extracted information
+    data = {}
+
+    # Extract activity type
+    activity_type = card.find('p', class_='activity__type').text
+    data['activity_type'] = activity_type
+
+    # Extract activity name
+    activity_name = soup.find('h1').text
+    data['activity_name'] = activity_name
+
+    # Extract date and time
+    date_time = soup.find('time').text.strip().replace(' ','').replace('\ntot','').split('\n')
+    start_date, start_time, end_time = date_time
+    data['start_date'] = start_date
+    data['start_time'] = start_time
+    data['end_time'] = end_time
+
+    # Extract theme if available
+    theme = soup.select_one('.activity-show dt:contains("Thema") + dd')
+    if theme:
+        data['theme'] = theme.text.strip()
+
+    # Extract organized by
+    organized_by = soup.select_one('.activity-show dt:contains("Georganiseerd door") + dd')
+    if organized_by:
+        data['organized_by'] = organized_by.text.strip()
+
+    # Extract participating department
+    participating_department = soup.select_one('.activity-show dt:contains("Deelnemende afdeling") + dd')
+    if participating_department:
+        data['participating_department'] = participating_department.text.strip()
+
+    # Extract age group
+    age_group = soup.select_one('.activity-show dt:contains("Leeftijdsgroep") + dd')
+    if age_group:
+        data['age_group'] = age_group.text.strip()
+
+    # Extract location
+    location = soup.select_one('.activity-show dt:contains("Locatie") + dd')
+    if location:
+        data['location'] = location.text.strip()
+
+    # Extract number of participants
+    num_participants = soup.select_one('.activity-show dt:contains("Aantal deelnemers") + dd')
+    if num_participants:
+        data['num_participants'] = int(num_participants.text.strip())
+
+    # Extract whether to bring a bicycle
+    bring_bicycle = soup.select_one('.activity-show dt:contains("Fiets meenemen") + dd')
+    if bring_bicycle:
+        data['bring_bicycle'] = bring_bicycle.text.strip()
+
+    # Extract activity description
+    activity_description = soup.select_one('.activity-show .text-columns__1')
+    if activity_description:
+        data['activity_description'] = activity_description.text.strip()
+
+    # Extract responsible person(s)
+    responsible_persons = [element.get_text(strip=True) for element in soup.select('.activity-show strong')]
+    data['responsible_persons'] = responsible_persons
+
+    # Extract activity description
+    activity_description = soup.find('div', class_='text-columns__1')
+    if activity_description:
+        data['activity_description2'] = activity_description.text.strip()
+
+    # Extract responsible person(s)
+    responsible_persons = []
+    responsible_person_elements = soup.find_all('strong')
+    for element in responsible_person_elements:
+        responsible_person = element.text.strip()
+        if "(Activiteitverantwoordelijke)" in responsible_person:
+            responsible_person = responsible_person.replace("(Activiteitverantwoordelijke)", "").strip()
+        responsible_persons.append(responsible_person)
+    data['responsible_persons2'] = responsible_persons
+    return data
+
+# Define a function to convert BeautifulSoup tree to JSON
+def html_to_json(element):
+    result = {}
+    if element.name:
+        result[element.name] = {}
+        if element.attrs:
+            result[element.name]["attributes"] = element.attrs
+        if element.contents:
+            if len(element.contents) == 1 and element.contents[0].string:
+                result[element.name]["text"] = element.contents[0]
+            else:
+                result[element.name]["children"] = [html_to_json(child) for child in element.contents if child.name or (str(child).strip() != '')]
+    return result
+
+
 def old():
     #authorize based on url in location of response received
     response = s.get(oauth_location,headers=header,timeout=10,allow_redirects=False)
