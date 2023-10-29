@@ -182,6 +182,7 @@ class ComponentUserSensor(Entity):
         await self._data.update()
         self._userdetails = self._data._userdetails
         self._last_update =  self._data._last_update
+        self._refresh_required = self._data._refresh_required
         self._age_group = self._userdetails.get('department').get('age_group')
         self._department_title = self._userdetails.get('department').get('department_title')
         self._name = self._userdetails.get('user_details').get('name')
@@ -219,7 +220,8 @@ class ComponentUserSensor(Entity):
             "department": self._department_title,
             "name": self._name,
             "username": self._username,
-            "membership_number": self._membership_number
+            "membership_number": self._membership_number,
+            "refresh required": self._refresh_required
         }
 
    

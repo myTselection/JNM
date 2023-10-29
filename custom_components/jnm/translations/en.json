@@ -37,5 +37,21 @@
             "missing data options handler": "Option handler failed",
             "no_valid_settings": "No valid settings check in ha config."
         }
+    },
+    "services": {
+        "subscribe_activity": {
+            "name": "subscribe_activity",
+            "description": "Subscribe for an activity",
+            "fields": {
+                "activity_url": {
+                    "name": "activity_url",
+                    "description": "url of the activity"
+                }
+            }
+        }, 
+        "update": {
+            "name": "update",
+            "description": "Dwing een update van de sensorgegevens af (standaardupdates zijn beperkt per uur)."
+        }
     }
 }

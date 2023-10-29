@@ -37,5 +37,21 @@
             "missing data options handler": "Gegevens ontbreken",
             "no_valid_settings": "Ongeldige configuratie"
         }
+    },
+    "services": {
+        "subscribe_activity": {
+            "name": "subscribe_activity",
+            "description": "Inschrijven voor een activiteit",
+            "fields": {
+                "activity_url": {
+                    "name": "activity_url",
+                    "description": "url van de acitviteit"
+                }
+            }
+        }, 
+        "update": {
+            "name": "update",
+            "description": "Dwing een update van de sensorgegevens af (standaardupdates zijn beperkt per uur)."
+        }
     }
 }

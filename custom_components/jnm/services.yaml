@@ -1,0 +1,14 @@
+# Describes the format for available services for jnm
+
+subscribe_activity:
+  description: >
+    Subscribe to a specific activity
+  fields:
+    activity_url:
+      description: >
+        The main url of the activity
+      example: https://jnm.be/nl/activiteiten/bomen-zijn-relaxed
+      
+update:
+  description: >
+    Force an update of the sensor data (standard updates are throttled per hour).

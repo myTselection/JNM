@@ -74,8 +74,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     hass.async_create_task(
         hass.config_entries.async_forward_entry_setup(config_entry, Platform.SENSOR)
     )
-    # _LOGGER.info(f"{DOMAIN} register_services")
-    # register_services(hass, config_entry)
+    _LOGGER.info(f"{DOMAIN} register_services")
+    register_services(hass, config_entry)
     return True
 
 
@@ -86,3 +86,39 @@ async def async_remove_entry(hass, config_entry):
     except ValueError:
         pass
 
+
+def register_services(hass, config_entry):
+        
+    async def handle_subscribe_activity(call):
+        """Handle the service call."""
+        activity_url = call.data.get('activity_url')
+        
+        config = config_entry.data
+        username = config.get("username")
+        password = config.get("password")
+        session = ComponentSession()
+        userdetails = await hass.async_add_executor_job(lambda: session.login(username, password))
+        assert userdetails is not None
+        _LOGGER.debug(f"{NAME} handle_subscribe_activity login completed")
+        subscribe_activity_feedback = await hass.async_add_executor_job(lambda: session.subscribe_activity(activity_url))
+        # state_warning_sensor = hass.states.get(f"sensor.{DOMAIN}_warning")
+        # _LOGGER.debug(f"state_warning_sensor sensor.{DOMAIN}_warning {state_warning_sensor}")
+        # state_warning_sensor_attributes = dict(state_warning_sensor.attributes)
+        # state_warning_sensor_attributes["refresh_required"] = state_warning_sensor_attributes.get("refresh_required", False) or (extension_confirmation > 0)
+        # _LOGGER.debug(f"state_warning_sensor attributes sensor.{DOMAIN}_warning: {state_warning_sensor_attributes}")
+        # await hass.async_add_executor_job(lambda: hass.states.set(f"sensor.{DOMAIN}_warning",state_warning_sensor.state,state_warning_sensor_attributes))
+
+                            
+
+    async def handle_update(call):
+        """Handle the service call."""
+        # state_warning_sensor = hass.states.get(f"sensor.{DOMAIN}_warning")
+        # _LOGGER.debug(f"state_warning_sensor sensor.{DOMAIN}_warning {state_warning_sensor}")
+        # state_warning_sensor_attributes = dict(state_warning_sensor.attributes)
+        # state_warning_sensor_attributes["refresh_required"] = True
+        # await hass.async_add_executor_job(lambda: hass.states.set(f"sensor.{DOMAIN}_warning",state_warning_sensor.state,state_warning_sensor_attributes))
+
+
+    hass.services.async_register(DOMAIN, 'subscribe_activity', handle_subscribe_activity)
+    hass.services.async_register(DOMAIN, 'update', handle_update)
+    _LOGGER.info(f"async_register done")
