@@ -224,7 +224,12 @@ class ComponentSession(object):
 
         # Extract date and time
         date_time = soup.find('time').text.strip().replace(' ','').replace('\ntot','').split('\n')
-        start_date, start_time, end_time = date_time
+        if len(date_time) == 3:
+            start_date, start_time, end_time = date_time
+        if len(date_time) == 4:
+            start_date, start_time, end_date, end_time = date_time
+            data['end_date'] = end_date
+        
         data['start_date'] = start_date
         data['start_time'] = start_time
         data['end_time'] = end_time
@@ -257,7 +262,7 @@ class ComponentSession(object):
         # Extract number of participants
         num_participants = soup.select_one('.activity-show dt:contains("Aantal deelnemers") + dd')
         if num_participants:
-            data['num_participants'] = int(num_participants.text.strip())
+            data['num_participants'] = int(num_participants.text.replace('1 / ','').replace('/','').replace(' ','').strip())
 
         # Extract whether to bring a bicycle
         bring_bicycle = soup.select_one('.activity-show dt:contains("Fiets meenemen") + dd')
