@@ -278,6 +278,24 @@ class ComponentSession(object):
         responsible_persons = [element.get_text(strip=True) for element in soup.select('.activity-show strong')]
         data['responsible_persons'] = responsible_persons
 
+        # Extract subscribed members
+
+        # Find the <h2> tag with text "Deelnemers"
+        deelnemers_heading = soup.find('h2', text='Deelnemers')
+
+        # If found, extract the <li> items under it
+        if deelnemers_heading:
+            deelnemers_list = deelnemers_heading.find_next('ul', class_='list-unstyled')
+            if deelnemers_list:
+                deelnemers = [item.get_text(strip=True) for item in deelnemers_list.find_all('li')]
+                data['subscribed_members'] = deelnemers
+                _LOGGER.debug("Deelnemers: %s", deelnemers)
+            else:
+                _LOGGER.debug("No 'deelnemers' list found.")
+        else:
+            _LOGGER.debug("No 'Deelnemers' heading found.")
+        # subscribed_members = [element.get_text(strip=True) for element in soup.select('list-unstyled list-inline mb-0')]
+
         # # Extract activity description
         # activity_description = soup.find('div', class_='text-columns__1')
         # if activity_description:

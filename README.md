@@ -122,7 +122,11 @@ content: >-
 
   | :-----| :----------|
 
-  {% for activity in state_attr('sensor.jnm_mathias_janssens_03062013_next_activity','future activities') %}| {{activity.date| as_timestamp | timestamp_custom("%a %d/%m/%Y")}} | {% if activity.details is defined %}<details><summary>[{{activity.name}}]({{activity.link}})</summary><table><tr><th>Locatie</th><td><a href="https://www.google.com/maps?q={{activity.details.location}}">{{activity.details.location}}</a></td></tr><tr><th>Uur</th><td>{{activity.details.start_time}} - {{activity.details.end_time}}</td></tr><tr><th>Omschrijving</th>{% if activity.details.activity_description is defined %}<td>{{activity.details.activity_description}}</td>{% endif %}</tr><tr><th>Deelnemers</th>{% if activity.details.num_participants is defined %}<td>{{activity.details.num_participants}}</td>{% endif %}</tr></table></details>{% else %}[{{activity.name}}]({{activity.link}}){% endif %} |
+  {% for activity in state_attr('sensor.jnm_[name]_next_activity','future activities') %}| {{activity.date| as_timestamp | timestamp_custom("%a%d/%m/%Y")}} | 
+  {% if activity.details is defined %}<details><summary>[{{activity.name}}]({{activity.link}})</summary><table><tr><th>Locatie</th><td><a
+  href="https://www.google.com/maps?q={{activity.details.location}}">{{activity.details.location}}</a></td></tr><tr><th>Uur</th><td>{{activity.details.start_time}}
+  - {{activity.details.end_time}}</td></tr>{% if activity.details.activity_description is defined %}<tr><th>Omschrijving</th><td>{{activity.details.activity_description}}</td></tr>{% endif %}{% if activity.details.num_participants is defined %}<tr><th>Deelnemers</th><td>{{activity.details.num_participants}}{% if activity.details.subscribed_members is defined %}: {{activity.details.subscribed_members | join(' ')}}{% endif %}</td></tr>{% endif %}</table><details>{% else %}[{{activity.name}}]({{activity.link}}){% endif %} |
+
   {% endfor %}
 
 
@@ -130,6 +134,7 @@ content: >-
   Laatst bijgewerkt
   {{state_attr('sensor.jnm_[name]_group','last update')|
   as_timestamp | timestamp_custom("%a %d/%m/%Y %H:%M")}}
+
 
 ```
 
