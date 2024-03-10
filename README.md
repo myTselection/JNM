@@ -9,7 +9,9 @@
 # JNM - Home Assistant integration
 [JNM](https://www.jnm.be/) Home Assistant custom component integration for Belgium. JNM is a Belgian youth union for Nature and the Environment, https://jnm.be/nl/dat-is-jnm This custom component has been built from the ground up to bring jnm.be activities listed on the site into Home Assistant sensors in order to follow up activities and subscribe. This integration is built against the public website provided by jnm.be for Belgium and has not been tested for any other countries.
 
-This integration is in no way affiliated with JNM. **Please don't report issues with this integration to JNM, they will not be able to support you.**
+This integration is in no way affiliated with JNM. 
+| :warning: Please don't report issues with this integration to JNM, they will not be able to support you.** |
+| ----------------------------------------------------------------------------------------------------------------------|
 
 <p align="center"><img src="https://raw.githubusercontent.com/myTselection/JNM/master/icon.png"/></p>
 
