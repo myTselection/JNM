@@ -102,7 +102,7 @@ class ComponentSession(object):
 
         # Extract relevant data
         # Find the unsorted list with the specified class
-        ulist = soup.find('ul', class_='list-unstyled list--icon mb-4')
+        ulist = soup.find('ul', class_='mb-4 list-unstyled list--icon')
 
         if ulist:
             # Extract the second list item as the "name" value
