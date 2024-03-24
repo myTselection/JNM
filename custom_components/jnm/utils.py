@@ -132,9 +132,10 @@ class ComponentSession(object):
 
     def getActivities(self, user_details):
         department = user_details.get('department').get('department_title').replace(' ','-').lower()
-        age_group = user_details.get('department').get('age_group').lower()
+        age_group = user_details.get('department').get('age_group')
         
         activities = self.getActivityData(f"https://jnm.be/nl/activiteiten?group={age_group}&department={department}")
+        _LOGGER.debug(f"jnm.be getActivityData: https://jnm.be/nl/activiteiten?group={age_group}&department={department}")
 
         for activity in activities:
             activity_details = self.getActivityDetailsData(activity.get('link'))
