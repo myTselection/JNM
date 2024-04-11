@@ -11,7 +11,7 @@ import voluptuous as vol
 
 _LOGGER = logging.getLogger(__name__)
 
-_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.0%z"
+_DATETIME_FORMAT = "%d.%m.%Y"
 
 class Groups(Enum):
     PIEPERS = ("PIEPERS")
@@ -146,7 +146,16 @@ class ComponentSession(object):
     def getSubscribedActivities(self):
         activities = self.getActivityData("https://jnm.be/nl/mijn-activiteiten")
 
-        return activities
+        # Get today's date
+        today = datetime.now() #.strftime(_DATETIME_FORMAT)
+
+        # Filter activities to remove those with past dates
+        filtered_activities = [activity for activity in activities if activity['date'] >= today]
+
+        # Sort filtered activities by date in descending order
+        sorted_activities = sorted(filtered_activities, key=lambda x: x['date'])
+
+        return sorted_activities
         
     def getActivityData(self, url):
         self.s.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
@@ -179,7 +188,7 @@ class ComponentSession(object):
             if len(date_parts) == 2:
                 date = date_parts[1]
             # Convert the cleaned date string to a date object
-            date = datetime.strptime(date, "%d.%m.%Y")
+            date = datetime.strptime(date, _DATETIME_FORMAT)
 
 
             # Extract name
