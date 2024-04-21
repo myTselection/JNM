@@ -147,7 +147,7 @@ class ComponentSession(object):
         activities = self.getActivityData("https://jnm.be/nl/mijn-activiteiten")
 
         # Get today's date
-        today = datetime.now() #.strftime(_DATETIME_FORMAT)
+        today = datetime.now().date()
 
         # Filter activities to remove those with past dates
         filtered_activities = [activity for activity in activities if activity['date'] >= today]
@@ -188,7 +188,7 @@ class ComponentSession(object):
             if len(date_parts) == 2:
                 date = date_parts[1]
             # Convert the cleaned date string to a date object
-            date = datetime.strptime(date, _DATETIME_FORMAT)
+            date = datetime.strptime(date, _DATETIME_FORMAT).date()
 
 
             # Extract name
